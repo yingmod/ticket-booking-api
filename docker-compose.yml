@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # 1. Redis cho Khóa phân tán (Distributed Lock - Redisson) & Caching
+  redis:
+    image: redis:7.2-alpine
+    container_name: ticket-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+
+  # 2. RabbitMQ Message Broker với giao diện Web Management
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: ticket-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # Cổng giao thức AMQP cho Spring Boot kết nối
+      - "15672:15672"  # Cổng Web Dashboard (User/Pass mặc định: guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
