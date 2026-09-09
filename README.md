@@ -1,6 +1,9 @@
 # High-Concurrency Flash Sale & Ticket Booking System 🎟️
 
 [![CI/CD Pipeline](https://github.com/yingmod/ticket-booking-api/actions/workflows/ci.yml/badge.svg)](https://github.com/yingmod/ticket-booking-api/actions/workflows/ci.yml)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Swagger%20UI-brightgreen?logo=swagger)](https://ticket-booking-api-m0lv.onrender.com/swagger-ui.html)
+
+> 🌐 **Live Demo (Trải nghiệm trực tuyến 24/7):** [https://ticket-booking-api-m0lv.onrender.com/swagger-ui.html](https://ticket-booking-api-m0lv.onrender.com/swagger-ui.html)
 
 Dự án thứ 5 - Dự án đỉnh cao (Capstone Project) trong lộ trình thực chiến Backend Spring Boot chuyên sâu. Hệ thống mô phỏng nền tảng săn vé Concert / Flash Sale tải cao với kiến trúc **Redis Distributed Lock (Redisson)** và **RabbitMQ Event-Driven Architecture**.
 
