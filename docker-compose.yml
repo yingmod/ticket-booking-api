@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. Redis cho Khóa phân tán (Distributed Lock - Redisson) & Caching
+  # 1. Redis cho Khóa phân tán (Distributed Lock - Redisson)
   redis:
     image: redis:7.2-alpine
     container_name: ticket-redis
@@ -9,15 +9,45 @@ services:
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - ticket-network
 
-  # 2. RabbitMQ Message Broker với giao diện Web Management
+  # 2. RabbitMQ Message Broker với giao diện Web Dashboard
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     container_name: ticket-rabbitmq
     restart: unless-stopped
     ports:
-      - "5672:5672"    # Cổng giao thức AMQP cho Spring Boot kết nối
-      - "15672:15672"  # Cổng Web Dashboard (User/Pass mặc định: guest/guest)
+      - "5672:5672"    # Cổng kết nối ứng dụng AMQP
+      - "15672:15672"  # Cổng Web Dashboard (guest / guest)
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - ticket-network
+
+  # 3. Ứng dụng Spring Boot Backend
+  ticket-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticket-booking-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - REDIS_HOST=redis          # Tự động trỏ sang container redis qua Docker DNS
+      - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq    # Tự động trỏ sang container rabbitmq qua Docker DNS
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+    depends_on:
+      - redis
+      - rabbitmq
+    networks:
+      - ticket-network
+
+networks:
+  ticket-network:
+    driver: bridge

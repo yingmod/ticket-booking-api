@@ -1,5 +1,7 @@
 # High-Concurrency Flash Sale & Ticket Booking System 🎟️
 
+[![CI/CD Pipeline](https://github.com/yingmod/ticket-booking-api/actions/workflows/ci.yml/badge.svg)](https://github.com/yingmod/ticket-booking-api/actions/workflows/ci.yml)
+
 Dự án thứ 5 - Dự án đỉnh cao (Capstone Project) trong lộ trình thực chiến Backend Spring Boot chuyên sâu. Hệ thống mô phỏng nền tảng săn vé Concert / Flash Sale tải cao với kiến trúc **Redis Distributed Lock (Redisson)** và **RabbitMQ Event-Driven Architecture**.
 
 ---
@@ -80,15 +82,35 @@ Hệ thống tự động khởi tạo dữ liệu mẫu khi khởi động:
 
 ## 🛠️ Hướng Dẫn Chạy & Kiểm Thử
 
-1. Khởi động hạ tầng Redis & RabbitMQ (nếu dùng Docker):
+### Cách 1: Chạy toàn bộ hệ thống bằng Docker Compose (Khuyên dùng)
+Chỉ với 1 câu lệnh duy nhất, toàn bộ ứng dụng (Spring Boot App + Redis 7.2 + RabbitMQ 3.13) sẽ được build và khởi chạy độc lập trong Docker container:
+
+```bash
+docker compose up -d --build
+```
+- **Ứng dụng:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **RabbitMQ Management Dashboard:** [http://localhost:15672](http://localhost:15672) (User: `guest` / Pass: `guest`)
+- **Dừng hệ thống:** `docker compose down`
+
+### Cách 2: Chạy môi trường Local Development
+1. Khởi động các dịch vụ phụ trợ (Redis & RabbitMQ):
    ```bash
-   docker compose up -d
+   docker compose up -d redis rabbitmq
    ```
-2. Biên dịch và chạy ứng dụng Spring Boot:
+2. Khởi chạy ứng dụng Spring Boot:
    ```bash
-   mvn spring-boot:run
+   ./mvnw spring-boot:run
    ```
-3. Mở Swagger UI trải nghiệm:
-   ```
-   http://localhost:8080/swagger-ui.html
-   ```
+3. Truy cập Swagger UI trải nghiệm:
+   [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+---
+
+## 🔄 Quy Trình CI/CD (GitHub Actions)
+
+Dự án tích hợp đường ống CI/CD tự động (`.github/workflows/ci.yml`):
+- **Tự động kích hoạt** mỗi khi có `push` hoặc `pull_request` vào nhánh `main`.
+- **Dựng môi trường kiểm thử thực tế**: Tự động spin-up Service Containers cho Redis & RabbitMQ trên GitHub Runner.
+- **Kiểm thử tự động**: Chạy toàn bộ test suites (`./mvnw clean test`).
+- **Đóng gói Docker**: Build kiểm tra Multi-stage Docker Image (`Dockerfile`) tối ưu kích thước (~140MB JRE Alpine) chạy dưới quyền Non-root user (`appuser`).
+
